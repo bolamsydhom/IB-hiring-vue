@@ -1,6 +1,7 @@
 <template>
   <div class="c-chart__container">
     <v-chart ref="chart" :option="chartOptions" />
+    <span>{{ newDateRange }}</span>
   </div>
 </template>
 
@@ -16,6 +17,7 @@ import {
   VisualMapComponent,
 } from "echarts/components";
 import VChart from "vue-echarts";
+import store from "../../store";
 
 use([
   CanvasRenderer,
@@ -32,39 +34,19 @@ export default {
   components: {
     VChart,
   },
-
+  props: ["dateRange"],
+  watch: {
+    // This would be called anytime the value of dateRange changes
+    dateRange(newValue, oldValue) {
+      // you can do anything here with the new value or old/previous value
+      console.log("dateRange", this.dateRange);
+      this.newDateRange = this.dateRange;
+    },
+  },
   data() {
     return {
-      chartData: [
-        {
-          date_ms: 1641772800000,
-          performance: 0.2,
-        },
-        {
-          date_ms: 1641859200000,
-          performance: 0.33,
-        },
-        {
-          date_ms: 1641945600000,
-          performance: 0.53,
-        },
-        {
-          date_ms: 1642032000000,
-          performance: 0.31,
-        },
-        {
-          date_ms: 1642118400000,
-          performance: 0.65,
-        },
-        {
-          date_ms: 1642204800000,
-          performance: 0.88,
-        },
-        {
-          date_ms: 1642291200000,
-          performance: 0.07,
-        },
-      ],
+      chartData: [],
+      newDateRange: "1",
     };
   },
 
@@ -83,7 +65,7 @@ export default {
           left: "center",
         },
         tooltip: {
-          trigger: 'axis',
+          trigger: "axis",
           transitionDuration: 0,
           confine: false,
           hideDelay: 0,
@@ -109,6 +91,7 @@ export default {
           axisLabel: {
             fontSize: 11,
           },
+          boundaryGap: false,
         },
         yAxis: {
           axisLabel: { show: true },
@@ -127,16 +110,44 @@ export default {
             },
           },
         ],
+        visualMap: {
+          left: "right",
+          top: "top",
+          min: 0,
+          max: 100,
+          pieces: [
+            {
+              lte: 50,
+              color: "#c04444",
+            },
+            {
+              gt: 50,
+              lte: 80,
+              color: "#c0a944",
+            },
+            {
+              gt: 80,
+              color: "#44c07c",
+            },
+          ],
+        },
       };
     },
 
     xAxisData() {
-      return this.chartData.map((item) => this.formatDate(item.date_ms));
+      return this.posts.map((item) => this.formatDate(item.date_ms));
     },
 
     yAxisData() {
-      return this.chartData.map((item) => +item.performance * 100);
+      return this.posts.map((item) => +item.performance * 100);
     },
+    posts() {
+      return store.state.performanceData;
+    },
+  },
+
+  mounted() {
+    store.dispatch("getPosts");
   },
 
   methods: {
