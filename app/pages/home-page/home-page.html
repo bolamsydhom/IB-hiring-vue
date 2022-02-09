@@ -6,7 +6,7 @@
   <employees-list employees-list="homePageVm.employees"></employees-list>
 
   <div class="c-dashboard__footer">
-    <button class="c-button">
+    <button ng-if="homePageVm.currentPage !== homePageVm.totalPages " type="button" ng-click="homePageVm.loadMoreEmployees()" class="c-button btn" ng-disabled="homePageVm.isLoading">
       Load More
     </button>
   </div>
