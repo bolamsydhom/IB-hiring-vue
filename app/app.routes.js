@@ -1,10 +1,12 @@
-angular.module('appModule')
-  .config(($locationProvider) => {
+angular
+  .module('appModule')
+  .config(($locationProvider, $urlMatcherFactoryProvider) => {
     $locationProvider.html5Mode({
       enabled: true,
     });
+    $urlMatcherFactoryProvider.strictMode(false);
   })
-  .config(($stateProvider) => {
+  .config(($urlRouterProvider, $stateProvider) => {
     $stateProvider
       .state({
         name: 'app',
@@ -18,4 +20,10 @@ angular.module('appModule')
         url: '/team-performance',
         template: '<v-performance-page></v-performance-page>',
       });
+    // .state({
+    //   name: 'not-found',
+    //   url: '/not-found',
+    //   template: '<v-not-found></v-not-found>',
+    // });
+    $urlRouterProvider.otherwise('/not-found');
   });
