@@ -1,7 +1,6 @@
 <template>
   <div class="c-chart__container">
     <v-chart ref="chart" :option="chartOptions" />
-    <span>{{ newDateRange }}</span>
   </div>
 </template>
 
@@ -39,14 +38,17 @@ export default {
     // This would be called anytime the value of dateRange changes
     dateRange(newValue, oldValue) {
       // you can do anything here with the new value or old/previous value
-      console.log("dateRange", this.dateRange);
       this.newDateRange = this.dateRange;
+      // console.log(new Date(this.formatDate(this.chartData[0].date_ms)).getTime(), this.chartData[0].date_ms);
+    },
+    chartOptions() {
+      this.chartOptions;
     },
   },
   data() {
     return {
       chartData: [],
-      newDateRange: "1",
+      newDateRange: null,
     };
   },
 
@@ -135,24 +137,48 @@ export default {
     },
 
     xAxisData() {
-      return this.posts.map((item) => this.formatDate(item.date_ms));
+      return this.getTheDataWithinDateRange();
+      // return this.performanceData.map((item) => this.formatDate(item.date_ms));
     },
 
     yAxisData() {
-      return this.posts.map((item) => +item.performance * 100);
+      return this.chartData.map((item) => +item.performance * 100);
     },
-    posts() {
+    performanceData() {
+      this.chartData = store.state.performanceData;
       return store.state.performanceData;
     },
   },
 
   mounted() {
-    store.dispatch("getPosts");
+    store.dispatch("getPerformanceData");
   },
 
   methods: {
     formatDate(dateInMs) {
       return moment(dateInMs).format("DD MMM YYYY");
+    },
+    getTheDataWithinDateRange() {
+
+      let data = this.performanceData;
+      if (!this.newDateRange) {
+        return data.map((item) => this.formatDate(item.date_ms));
+      } else {
+        this.chartData = [];
+        const xAxis = []
+        data.filter((item) => {
+          if (
+            new Date(this.formatDate(item.date_ms)).getTime() >=
+              new Date(this.dateRange[0]).getTime() &&
+            new Date(this.formatDate(item.date_ms)).getTime() <=
+              new Date(this.dateRange[1]).getTime()
+          ) {
+            this.chartData.push(item);
+            xAxis.push(this.formatDate(item.date_ms));
+          }
+        });
+        return xAxis;
+      }
     },
   },
 };
