@@ -1,0 +1,8 @@
+{
+    "component": {
+      "componentFolder": "app",
+      "testFiles": "**/*.spec.ts"
+    },
+    "baseUrl": "http://localhost:4210",
+    "chromeWebSecurity": false
+  }
